@@ -54,7 +54,6 @@ def pie_chart(volcanoes):
     return plt
 
 #volcano_stats takes data from column "Elevation (m)" and spits out the maximum, minimum, median, and mode
-values longitude and latitude
 def volcano_stats(volcanoes):
     stats = pd.to_numeric(volcanoes["Elevation (m)"], downcast='signed')
     statistics = {}
@@ -64,7 +63,7 @@ def volcano_stats(volcanoes):
     statistics["median"] = stats.median()
     return statistics
 
-#map_display displays the map based on the 
+#map_display displays the map based on the values longitude and latitude
 def map_display(volcanoes, z=1):
     lat_long_tuple = ("lat", "lon")
     coordinates = volcanoes[["Latitude", "Longitude"]]
