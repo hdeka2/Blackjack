@@ -3,10 +3,8 @@ Name: Heemakshi Deka
 Class: Frydenberg CS230
 Data: Volcanoes
 
-Description: bar_chart takes data from the column "Dominant Rock Type" from the volcanoes.csv and compares the data in a bar graph.
-pie_chart takes data from the column "Activity Evidence" and displays the data in a pie chart. volcano_stats takes data
-from column "Elevation (m)" and spits out the maximum, minimum, median, and mode. map_display displays the map based on the
-values longitude and latitude. select_country allows the user to select a country from the country_list pulling the data from the
+Description: .
+. . select_country allows the user to select a country from the country_list pulling the data from the
 "Country" column in the volcanoes.csv file and displays only volcanoes from the selected country. rock_type_volcano allows
 the user to select one of the different rock types pulling from the "Dominant Rock Type" column in the volcanoes.csv file.
 
@@ -19,7 +17,7 @@ import streamlit as st
 import pandas as pd
 import matplotlib.patches as mpatches
 
-
+#bar_chart takes data from the column "Dominant Rock Type" from the volcanoes.csv and compares the data in a bar graph
 def bar_chart(volcanoes):
     volcanoes["Dominant Rock Type"].value_counts().plot(kind='bar', color='coral')
     plt.xlabel("Dominant Rock Type", fontname="Times New Roman", fontweight="bold")
@@ -31,22 +29,32 @@ def bar_chart(volcanoes):
 
     return plt
 
-
+#pie_chart takes data from the column "Activity Evidence" and displays the data in a pie chart
 def pie_chart(volcanoes):
     colors = ['salmon', 'tomato', 'coral', 'sienna', 'chocolate', 'peru']
-    volcanoes["Activity Evidence"].value_counts().plot(kind='pie', autopct='%1.1f%%', colors=colors) # sorted by ascending value_counts
+
+    activity_evidence = volcanoes["Activity Evidence"]
     uncertain_tuple = ("Evidence Uncertain", "Uncertain Evidence")
-    activity_evidence = pd.Series(volcanoes["Activity Evidence"].unique())
     activity_evidence.replace({uncertain_tuple[0]: "Uncertain", uncertain_tuple[1]: "Uncertain"}, inplace=True) # duplicate entry in CSV for same value (uncertain)
-    arr = activity_evidence.unique()
-    patches = [mpatches.Patch(color=colors[i], label="{:s}".format(arr[i])) for i in range(len(arr))] #maps through color and columns
+
+    activity_evidence.value_counts().plot(kind='pie', autopct='%1.1f%%', colors=colors) # sorted by descending value_counts order
+
+    # grab legend order to match color
+    volcanoes["frequency"] = volcanoes.groupby("Activity Evidence")["Activity Evidence"].transform('count')
+    volcanoes.sort_values('frequency', inplace=True, ascending=False)
+
+    activity_evidence_by_frequency = volcanoes["Activity Evidence"].unique()
+
+    patches = [mpatches.Patch(color=colors[i], label="{:s}".format(activity_evidence_by_frequency[i])) for i in range(len(activity_evidence_by_frequency))] #maps through color and columns
 
     plt.axis('off')
     plt.title("Volcano Eruptions By Last Volcano Activity", loc='right')
-    plt.legend(handles=patches, bbox_to_anchor=(1.05, 1.0, 0.3, 0.2), loc='upper left')
+    plt.legend(handles=patches)
+    plt.legend(bbox_to_anchor=(1.05, 1.0, 0.3, 0.2), loc='upper left')
     return plt
 
-
+#volcano_stats takes data from column "Elevation (m)" and spits out the maximum, minimum, median, and mode
+values longitude and latitude
 def volcano_stats(volcanoes):
     stats = pd.to_numeric(volcanoes["Elevation (m)"], downcast='signed')
     statistics = {}
@@ -56,7 +64,7 @@ def volcano_stats(volcanoes):
     statistics["median"] = stats.median()
     return statistics
 
-
+#map_display displays the map based on the 
 def map_display(volcanoes, z=1):
     lat_long_tuple = ("lat", "lon")
     coordinates = volcanoes[["Latitude", "Longitude"]]
